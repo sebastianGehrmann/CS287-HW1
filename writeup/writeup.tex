@@ -2,171 +2,105 @@
 \documentclass[11pt]{article}
 
 \usepackage{common}
-\title{HW0: Sample Assignment}
-\author{Alexander Rush \\ srush@seas.harvard.edu \and Sam Wiseman \\ swiseman@seas.harvard.edu }
+\title{HW1: Text Classification}
+\author{Sebastian Gehrmann \\ gehrmann@seas.harvard.edu }
 \begin{document}
 
 \maketitle{}
 \section{Introduction}
 
-This note lays out our expectation for a homework submission in
-\textit{CS287: Statistical Natural Language Processing}. While you do
-not have to follow this template to the letter, we do expect that
-write-ups have a very clear structure and cover all the elements
-described in this note. With this in mind, the burden is on the
-presenter to demonstrate why deviations from the standard are
-necessary.
+Classifying documents is a common problem in computer science. Whether it is detecting spam mail or numbers in handwriting, classification is used everywhere. There are many different algorithms that are used in this area. In this write-up, three of them are described, implemented and compared with each other. 
 
-All write-ups should include a short introduction. In this section you
-should summarize the underlying problem in high-level language and
-describe the extensions that you have decided to propose in your
-implementation. When you describe these extensions you should
-carefully cite the papers of interest. For instance, it will often be
-useful to cite the work seen in class
-\citep{murphy2012machine}. Alternatively, you can also cite papers
-inline, for instance the work of \citet{berger1996maximum}.
-
+The data that was mainly used for development was the SST1 set. This includes parts of textual movie reviews and the corresponding rating on a scale from 1 to 5. The goal was to predict the score given the text.
 
 \section{Problem Description}
 
-In general, homeworks will be specified using informal
-language. As part of the assignment, we expect you to write-out a
-definition of the problem and your model in formal language. For this
-class, we will use the following notation:
+The given problem is to predict the probability distribution over $|\mcC|$  ratings $\boldy$ given a feature set $\boldx$. The feature set is a vector of length $|\mcF|$, where $\mcF$ is the full vocabulary of the set. It is defined as $x=\sum_i\delta(f_i)$. In this case, $\delta$ indicates a one-hot vector with the $1$ at position $f_i$. That means that the input vector consists of $0$'s except for the words that the input actually contains. There, the input has $1$'s.
+The output has the form $\boldy=\delta(c)$, with $c$ being the correct class. Single predictions are named $\bold{\hat{y}}$ and are not one-hot vectors.
 
-\begin{itemize}
-\item $\boldb, \boldm$;  bold letters for vectors.
-\item $\boldB, \boldM$;  bold capital letters for matrices.
-\item $\mcB, \mcM$;  script-case for sets.
-\item $b_i, x_i$; lower case for scalars or indexing into vectors.
-\end{itemize}
+Thus the ultimate goal of this problem is to find $p(\boldY|\boldX)$. 
 
+The accuracy's in this write-up will all be measured as the ratio of correctly predicted ratings.
+ 
 
-For instance in natural language processing, it is common to use
-discrete sets like $\mcV$ for the vocabulary of the language, or $\mcT$ for a
-tag set of the language.  We might also want one-hot vectors
-representing words. These will be of the type
-$\boldv \in \{0,1\}^{|\mcV|}$. In a note, it is crucial to define the
-types of all variables that are introduced. The problem description is the
-right place to do this.
-
-% NLP is also
-% full of sequences. For instance sentences, $w_1, \ldots, w_N$, where
-% here $N$ is a constant length and $w_i \in \mcV$ for all
-% $i \in \{1, \ldots N\}$. If we pretend sentences are all the same
-% length, we can have scoring function over sentences,
-% $s : \mcV^N \mapsto \reals$.  One might be defined as:
-
-% \[ s(w_1, \ldots, w_N) = \sum_{i = 1}^N p(w_i | w_{i-2}, w_{i-1}), \]
-
-% \noindent where $p$ is the bigram probability, which we will cover later in the class.
 
 \section{Model and Algorithms}
 
-Here you specify the model itself. This section should formally
-describe the model used to solve the task proposed in the previous
-section. This section should try to avoid introducing new vocabulary
-or notation, when possible use the notation from the previous section.
-Feel free to use the notation from class, but try to make the note
-understandable as a standalone piece of text.
+This write-up will compare three different linear models which will be explained separately. 
 
-This section is also a great place to include other material that
-describes the underlying structure and choices of your model, for
-instance here are some example tables and algorithms from full
-research papers:
+In general, a linear model has two parameter, $\boldW$ and $\boldb$. $\boldb$ is a bias term that has a value for each possible outcome class, and $\boldW$ has parameters for every possible feature $f$ and class $c$. Scores are predicted by computing 
+$$\bold{\hat{y}} = f(\boldx\boldW + \boldb)$$. The inner part of the function is called $z$.
+
+The goal of this is to minimize the loss of the parameters $\theta$, which is defined as the negative sum as the log-likelihoods of $p(\boldy|\boldx,\theta)$.
 
 
+\subsection{Naive Bayes}
 
-\begin{itemize}
-\item diagrams of your model,
+Naive Bayes is the model $$\prod_{i=1}^kp(x_{f_i}|\boldy)p(y)$$
+This model interpreted means nothing else that the probability of a sentence being in class $c$ is the product of the probability of that class multiplied with the probability of every single word in that sentence. 
 
-  \begin{center}
-    \includegraphics[width=0.4\textwidth]{network}
-  \end{center}
-\item feature tables,
+A simple example is the sentence `'A terrible'' being classified in one of two categories. In this example, in our randomly chosen training data we have 50\% samples of class $0$. For this class, the probability for `'A'' is 20\% and for `'terrible'', it is 10\%. The non-normalized probability for class 0 is now 1%.
 
-  \begin{center}
-    \begin{tabular}{@{}lll@{}}
-      \toprule
-      &\multicolumn{2}{c}{Mention Features  } \\
-      & Feature & Value Set\\
-      \midrule
-      & Mention Head & $\mcV$ \\
-      & Mention First Word & $\mcV$ \\
-      & Mention Last Word & $\mcV$ \\
-      & Word Preceding Mention & $\mcV$ \\
-      & Word Following Mention & $\mcV$\\
-      & \# Words in Mention & $\{1, 2, \ldots \}$ \\
-      & Mention Type & $\mathcal{T}$ \\
-      \bottomrule
-    \end{tabular}
-  \end{center}
+Class 1, however, has the probabilities 20\% and 1\%. Thus, the non-normalized probability for it is $0.1\%$. Normalizing the probabilities would give a $\frac{10}{11}$ probability to class 0, making it the more probable one of the two. 
 
-\item pseudo-code,
+The model used here has an added word count of $\alpha$ added to every single word in order to account for rare words. 
 
-  \begin{algorithmic}[1]
-    \Procedure{Linearize}{$x_1\ldots x_N$, $K$, $g$}
-    \State{$B_0 \gets \langle (\langle \rangle, \{1, \ldots, N\}, 0, \boldh_0, \mathbf{0})  \rangle$}
-    \For{$m = 0, \ldots, M-1$ }
-    \For{$k = 1, \ldots, |B_m|$}
-    \For{$i \in \mcR$}
-    \State{$(y, \mcR, s, \boldh) \gets \mathrm{copy}(B_m^{(k)})$}
-    \For{word $w$ in phrase $x_i$}
-    \State{$y \gets y $ append $w$ }
-    \State{$s \gets s + \log q(w, \boldh) $ }
-    \State{$\boldh \gets \delta(w, \boldh)$}
-    \EndFor{}
-    \State{$B_{m+|w_i|} \gets B_{m+|w_i|} + (y, \mcR - i, s,   \boldh)$}
-    \State{keep top-$K$ of $B_{m+|w_i|}$ by $f(x, y) + g(\mcR)$}
-    \EndFor{}
-    \EndFor{}
-    \EndFor{}
-    \State{\Return{$B_{M}^{(k)}$}}
-    \EndProcedure{}
-  \end{algorithmic}
+\subsection{Logistic Regression}
 
-\end{itemize}
+The intuition behind logistic regression is to force $\bold{\hat{y}}$ to be a distribution by using the softmax. The softmax of $\boldz$ is defined as $$\texttt{softmax}(\boldz)=\frac{\exp(\boldz)}{\sum_c\exp(z_c)}$$
 
+Using this in the loss-function yields the log of the softmax of z which does not have a closed form. Thus, we need to minimize the loss using different methods. In this case, we used stochastic gradient descent. 
+This method uses the partial derivatives of the loss-function with respect to the parameters $\boldW$ and $\boldb$ to compute the minimum of the loss. 
+
+To not have the parameters grow and potentially overfit the training data, $L_2$-Regularization is used as well. 
+
+
+\subsection{Linear SVM}
+
+The last model is the linear SVM using Hinge-loss. The goal in this approach is to directly find the parameters without using any function on $z$. That means that $\hat{y}$ is calculated by $\boldx\boldW+\boldb$
+Hinge-loss is defined as $$L(\hat{y},y)=\texttt{max}\{0, 1 - (\hat{y_c}+\hat{y_{c'}})\}$$ 
 
 \section{Experiments}
 
-Finally we end with the experimental section. Each assignment will make clear the main experiments and baselines that you should run. For these experiments you should present a main results table. Here we give a sample Table~\ref{tab:results}. In addition to these results you should describe in words what the table shows and the relative performance of the models.
+In the experiments, all three algorithms have been trained on the five data sets SST1, SST2, TREC, SUBJ and MPQA.
+Logistic regression and linear SVM both were trained for 3 full epochs using minibatch-SGD with a batchsize of 50 and a learning rate of .02. $\lambda$ in the regularization term has been set to 2. 
+For Naive Bayes, the $\alpha$ hyperparameter was 10.
+Below in table~\ref{tab:results} we report on the accuracy's for both training and validation data if it exists. An additional experiment with SST1 and LR trained for epochs yielded 0.60 and 0.39 as accuracy's.
 
-Besides the main results we will also ask you to present other results
-comparing particular aspects of the models. For instance, for word
-embedding experiments, we may ask you to show a chart of the projected
-word vectors. This experiment will lead to something like
-Figure~\ref{fig:clusters}. This should also be described within the
-body of the text itself.
-
-
-\begin{table}[h]
+\begin{table}[]
 \centering
-\begin{tabular}{llr}
- \toprule
- Model &  & Acc. \\
- \midrule
- \textsc{Baseline 1} & & 0.45\\
- \textsc{Baseline 2} & & 2.59 \\
- \textsc{Model 1} & & 10.59  \\
- \textsc{Model 2} & &13.42 \\
- \textsc{Model 3} & & 7.49\\
- \bottomrule
+\caption{The results of the experiments}
+\label{tab:results}
+\begin{tabular}{llll}
+\hline
+Model & Data & Training Acc. &  Validation Acc.\\ \hline
+NB  & SST1  & 0.49 & 0.27 \\
+LR  & SST1  & 0.57 & 0.35 \\
+SVM & SST1  & 0.52 & 0.30 \\ 
+NB  & SST2  & 0.55 & 0.51 \\
+LR  & SST2  & 0.57 & 0.64 \\
+SVM & SST2  & 0.51 & 0.55 \\
+NB  & TREC  & 0.02 &  \\
+LR  & TREC  & 0.69 &  \\
+SVM & TREC  & 0.71 &  \\
+NB  & SUBJ  & 0.93 &  \\
+LR  & SUBJ  & 0.50 &  \\
+SVM & SUBJ  & 0.50 &  \\
+NB  & MPQA  & 0.58 &  \\
+LR  & MPQA  & 0.38 &  \\
+SVM & MPQA  & 0.33 &  \\ \hline
 \end{tabular}
-\caption{\label{tab:results} Table with the main results.}
 \end{table}
 
 
-\begin{figure}
-  \centering
-  \includegraphics[width=6cm]{cluster_viz}
-  \caption{\label{fig:clusters} Sample qualitative chart.}
-\end{figure}
 
 
 \section{Conclusion}
 
-End the write-up with a very short recap of the main experiments and the main results. Describe any challenges you may have faced, and what could have been improved in the model.
+The results show that even though naive bayes is a simple model (and way faster to compute), it can compete or even outperform (see SUBJ) the more sophisticated algorithms. In general, all three models perform better than the baseline, although they might not be 100\% working (see NB in TREC or LR and SVM in SUBJ). Due to a lack of time, not many hyperparameter settings have been tried. 
+Tuning those will probably yield a few extra percentage points, as the experiment with SST1 and LR with 10 epochs shows. Unfortunately, the training for 10 epochs takes too long to be considered in this report. Additionally, using a bigram feature would increase the algorithms' success greatly since a greater context contains more information. An example for this is `'not bad'' which has a positive sentiment while the individual words might have a negative one.
+
+
 
 \bibliographystyle{apalike}
 \bibliography{writeup}

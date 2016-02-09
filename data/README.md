@@ -1,14 +1,14 @@
 # Datasets
 
-**Data** | Classes | Average sentence length | Dataset size | Vocab size | Number of words present in word2vec | Test size
---- | --- | --- | --- | --- | --- | ---
-MR | 2 | 20 | 10662 | 18765 | 16448 | CV
-SST1 | 5 | 18 | 11855 | 17836 | 16262 | 2210
-SST2 | 2 | 19 | 9613 | 16185 | 14838 | 1821
-Subj | 2 | 23 | 10000 | 21323 | 17913 | CV
-TREC | 6 | 10 | 5952 | 9592 | 9125 | 500
-CR | 2 | 19 | 3775 | 5340 | 5046 | CV
-MPQA | 2 | 3 | 10606 | 6246 | 6083 | CV
+**Data** | Classes | Avg. sentence length | Dataset size | Vocab size | Number words in word2vec | Test size
+-------- | ------- | -------------------- | ------------ | ---------- | ------------------------ | ---------
+MR       |       2 |                   20 |        10662 |      18765 |                    16448 |        CV
+SST1     |       5 |                   18 |        11855 |      17836 |                    16262 |      2210
+SST2     |       2 |                   19 |         9613 |      16185 |                    14838 |      1821
+Subj     |       2 |                   23 |        10000 |      21323 |                    17913 |        CV
+TREC     |       6 |                   10 |         5952 |       9592 |                    v9125 |       500
+CR       |       2 |                   19 |         3775 |       5340 |                     5046 |        CV
+MPQA     |       2 |                    3 |        10606 |       6246 |                     6083 |        CV
 
 The following datasets are included in this directory:
   * **MR**: Movie reviews with one sentence per review. Classification involves detecting positive/negative reviews (Pang and Lee, 2005). [Link](https://www.cs.cornell.edu/people/pabo/movie-review-data/)

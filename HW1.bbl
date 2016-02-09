@@ -1,0 +1,33 @@
+\begin{thebibliography}{}
+
+\bibitem[Kim, 2014]{DBLP:conf/emnlp/Kim14}
+Kim, Y. (2014).
+\newblock Convolutional neural networks for sentence classification.
+\newblock In {\em Proceedings of the 2014 Conference on Empirical Methods in
+  Natural Language Processing, {EMNLP} 2014, October 25-29, 2014, Doha, Qatar,
+  {A} meeting of SIGDAT, a Special Interest Group of the {ACL}}, pages
+  1746--1751.
+
+\bibitem[Snoek et~al., 2012]{snoek2012practical}
+Snoek, J., Larochelle, H., and Adams, R.~P. (2012).
+\newblock Practical bayesian optimization of machine learning algorithms.
+\newblock In {\em Advances in neural information processing systems}, pages
+  2951--2959.
+
+\bibitem[Socher et~al., 2013]{socher2013recursive}
+Socher, R., Perelygin, A., Wu, J.~Y., Chuang, J., Manning, C.~D., Ng, A.~Y.,
+  and Potts, C. (2013).
+\newblock Recursive deep models for semantic compositionality over a sentiment
+  treebank.
+\newblock In {\em Proceedings of the conference on empirical methods in natural
+  language processing (EMNLP)}, volume 1631, page 1642. Citeseer.
+
+\bibitem[Wang and Manning, 2012]{wang2012baselines}
+Wang, S. and Manning, C.~D. (2012).
+\newblock Baselines and bigrams: Simple, good sentiment and topic
+  classification.
+\newblock In {\em Proceedings of the 50th Annual Meeting of the Association for
+  Computational Linguistics: Short Papers-Volume 2}, pages 90--94. Association
+  for Computational Linguistics.
+
+\end{thebibliography}

@@ -142,13 +142,17 @@ def main(arguments):
 
     filename = args.dataset + '.hdf5'
     with h5py.File(filename, "w") as f:
+
         f['train_input'] = train_input
         f['train_output'] = train_output
         if valid:
+            print(valid_input.shape, " this is the valid input shape")
             f['valid_input'] = valid_input
             f['valid_output'] = valid_output
         if test:
             f['test_input'] = test_input
+        print(V, "V")
+        print(C, "C")
         f['nfeatures'] = np.array([V], dtype=np.int32)
         f['nclasses'] = np.array([C], dtype=np.int32)
 
